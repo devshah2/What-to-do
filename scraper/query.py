@@ -1,6 +1,7 @@
 # Attempting to load pickle
 import pickle
 import datetime
+from getClasses import scraper
 
 with open('classesLinks.pkl', 'rb') as f: classesLinks=pickle.load(f)
 with open('classesTitles.pkl', 'rb') as f: classesTitles=pickle.load(f)
@@ -31,8 +32,19 @@ parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--day", help = "Set day (Mon, Tues, Wed, Thurs, Fri, etc)")
 parser.add_argument("-t", "--time", help = "Set time (8:30AM, 12:00PM, etc)")
 parser.add_argument("-i", "--interactive", help = "Set interactive on", action='store_true')
+parser.add_argument("-s", "--scrape", help = "Scrape again", action='store_true')
 args = parser.parse_args()
- 
+
+if args.scrape:
+    print("Time to scrape: ")
+    inp=input("Enter link or \"exit\" to start: ")
+    urls=[]
+    while(inp!="exit"):
+        urls.append(inp)
+        inp=input("Enter link or \"exit\" to start: ")
+    print("Now scraping")
+    scraper(urls)
+
 day=datetime.datetime.today().weekday()
 totime=datetime.datetime.today().time()
 if args.day:
