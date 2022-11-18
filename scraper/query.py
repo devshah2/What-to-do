@@ -13,8 +13,8 @@ def query(today=datetime.datetime.today().weekday(), totime=datetime.datetime.to
     startTimes=[]
     for ind, i in enumerate(days):
         frm=datetime.datetime.strptime(timings[ind][0],'%I:%M%p').time()
-        to=datetime.datetime.strptime(timings[ind][0],'%I:%M%p').time()
-        if(today in i and to>=totime):
+        to=datetime.datetime.strptime(timings[ind][1],'%I:%M%p').time()
+        if(today in i and to>totime):
             startTimes.append(frm)
             results.append([classesTitles[ind],locations[ind]])
     i=[]
@@ -30,6 +30,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-d", "--day", help = "Set day (Mon, Tues, Wed, Thurs, Fri, etc)")
 parser.add_argument("-t", "--time", help = "Set time (8:30AM, 12:00PM, etc)")
+parser.add_argument("-i", "--interactive", help = "Set interactive on", action='store_true')
 args = parser.parse_args()
  
 day=datetime.datetime.today().weekday()
@@ -49,4 +50,35 @@ if args.time:
     except Exception as e:
         print("Unable to parse entered time, going with current")
 
-print(query(day,totime))
+if not args.interactive:
+    print(query(day,totime))
+else:
+    print("Interactive time")
+    out=list(query(day,totime))
+    chosen=[]
+    ignore=[]
+    while out!=[]:
+        cls=out.pop(0)
+        if(cls in ignore):
+            continue
+        print(cls)
+        inp=input("Choose class y/n (exit to terminate): ")
+        if(inp.lower()=="y"):
+            chosen.append(cls)
+            # Add functionality to recalculate out
+            # Find end time of chosen class
+            to=datetime.datetime.strptime(timings[classesTitles.index(cls[0])][1],'%I:%M%p').time()
+            out=list(query(day,to))
+        elif(inp.lower()=="exit"):
+            break
+        else:
+            ignore.append(cls)
+
+    out=chosen
+    print()
+    print()
+    print("Classes for today: ")
+    for x in chosen:
+        print("{} at {} from {} to {}".format(x[0][x[0].find(':')+2:x[0].find('-')-1],x[1],timings[classesTitles.index(x[0])][0],timings[classesTitles.index(x[0])][1]))
+    print()
+    print()
